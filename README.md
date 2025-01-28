@@ -1,21 +1,65 @@
-# LSB-Matching-Revisited
-# LSB Steganography Project
+# LSB Matching Revisited Steganography Project
 
-This project demonstrates the use of Least Significant Bit (LSB) steganography to hide and retrieve messages within an image. The encoding and decoding operations work by manipulating the least significant bits of the pixel values in an image to store the binary representation of the secret message.
+This project demonstrates how to encode and decode messages using the **LSB Matching Revisited** method of **Least Significant Bit (LSB) steganography**. This method improves upon traditional LSB steganography by reducing detectability and enhancing robustness through a matching technique. The hidden message can later be extracted and decoded from the image.
+
+---
+
+## Features
+
+1. **Encode a Message**: Hide a secret message within an image using the LSB Matching Revisited technique.
+2. **Decode a Message**: Extract the hidden message from an encoded image.
+3. **Improved Robustness**: Enhances security by using the LSB Matching Revisited approach.
+
+---
 
 ## Requirements
 
-- Python 3.9
-- Pillow library for image processing
+- Python 3.x
+- `Pillow` library (for image manipulation)
 
-## Installation
-
-Install the required packages using `pip`:
+Install the required library using:
 
 ```bash
-pip install -r requirements.txt
+pip install pillow
 
-##Usage
-To encode a message in an image:
+Usage
+Encoding a Message into an Image
+To encode a message into an image:
 
+Run the script:
+
+bash
+Copy
+Edit
 python steganography.py
+Follow the prompts:
+
+Enter the image path: Provide the path of the image where the message will be hidden.
+Enter the secret message: Input the message you want to encode.
+Enter the output path: Provide the path where the new image (with the encoded message) will be saved.
+Example:
+bash
+Copy
+Edit
+Enter the image path: input_image.png
+Enter the secret message: This is a secret message.
+Enter output image path: output_image.png
+After execution, the encoded image will be saved as output_image.png.
+
+Decoding a Message from an Image
+To decode a hidden message from an image:
+
+Run the script:
+
+bash
+Copy
+Edit
+python steganography.py
+Follow the prompt:
+
+Enter the image path: Provide the path of the image containing the hidden message.
+Example:
+bash
+Copy
+Edit
+Enter the image path: output_image.png
