@@ -79,6 +79,7 @@ The script will extract and display the hidden message.
 
 The secret message is converted into binary form.
 The binary message is embedded into the least significant bits of the image’s pixel values using a matching approach to reduce changes to the pixel values.
+
 **Decoding:**
 
 The program extracts the least significant bits of the image’s pixel values.
