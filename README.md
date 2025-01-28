@@ -5,7 +5,7 @@ This project demonstrates the use of Least Significant Bit (LSB) steganography t
 
 ## Requirements
 
-- Python 3.x
+- Python 3.9
 - Pillow library for image processing
 
 ## Installation
@@ -14,3 +14,8 @@ Install the required packages using `pip`:
 
 ```bash
 pip install -r requirements.txt
+
+##Usage
+To encode a message in an image:
+
+python steganography.py
