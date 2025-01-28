@@ -21,14 +21,7 @@ Install the required library using:
 
 ```bash
 pip install pillow
-## Usage
 
-### Encoding a Message into an Image
+---
 
-To encode a message into an image:
-
-1. Run the script:
-
-   ```bash
-   python steganography.py
-
+## `Usage`
