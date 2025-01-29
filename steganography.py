@@ -1,98 +1,84 @@
 import os
 from PIL import Image
-from utils import validate_image, text_to_bin, bin_to_text
 
-class LSBSteganography:
-    def __init__(self, image_path: str):
-        """
-        Initializes the LSB Steganography with the given image path.
+class Steganography:
+    def __init__(self, image_path):
+        self.image = Image.open(image_path)
+        self.pixels = self.image.load()
+        self.width, self.height = self.image.size
 
-        :param image_path: Path to the image file.
-        """
-        self.image_path = image_path
-        self.image = None
+    def encode(self, message, output_image_path):
+        binary_message = ''.join(format(ord(char), '08b') for char in message) + '11111111'
+        binary_iter = iter(binary_message)
 
-    def load_image(self):
-        """Load the image into the program."""
-        try:
-            self.image = Image.open(self.image_path)
-        except Exception as e:
-            raise ValueError(f"Error loading image: {str(e)}")
-
-    def encode(self, message: str, output_image_path: str):
-        """
-        Encodes the message into the image using LSB.
-
-        :param message: The secret message to encode.
-        :param output_image_path: Path to save the image with the encoded message.
-        """
-        if not self.image:
-            self.load_image()
-
-        message_bin = text_to_bin(message)
-        message_len = len(message_bin)
-        width, height = self.image.size
-        pixels = self.image.load()
-
-        if message_len > width * height:
-            raise ValueError("Message too large for this image.")
-
-        msg_index = 0
-        for y in range(height):
-            for x in range(width):
-                pixel = list(pixels[x, y])
-
-                for color_index in range(3):  # RGB channels
-                    if msg_index < message_len:
-                        pixel[color_index] = (pixel[color_index] & ~1) | int(message_bin[msg_index])
-                        msg_index += 1
-                    if msg_index >= message_len:
-                        break
-
-                pixels[x, y] = tuple(pixel)
-
-                if msg_index >= message_len:
-                    break
-            if msg_index >= message_len:
-                break
-
-        self.image.save(output_image_path)
-        print(f"Message encoded and saved to {output_image_path}")
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = list(self.pixels[x, y])
+                for i in range(3):
+                    try:
+                        bit = next(binary_iter)
+                        pixel[i] = pixel[i] & ~1 | int(bit)
+                    except StopIteration:
+                        self.pixels[x, y] = tuple(pixel)
+                        self.image.save(output_image_path)
+                        return
+                self.pixels[x, y] = tuple(pixel)
 
     def decode(self):
-        """
-        Decodes the hidden message from the image.
+        binary_message = ''
 
-        :return: The decoded message.
-        """
-        if not self.image:
-            self.load_image()
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = self.pixels[x, y]
+                for i in range(3):
+                    binary_message += str(pixel[i] & 1)
 
-        width, height = self.image.size
-        pixels = self.image.load()
+        message_bits = [binary_message[i:i+8] for i in range(0, len(binary_message), 8)]
+        message = ''
+        for byte in message_bits:
+            if byte == '11111111':
+                break
+            try:
+                message += chr(int(byte, 2))
+            except ValueError:
+                print("Error decoding message: Invalid binary sequence.")
+                return ''
+        return message
 
-        message_bin = ""
-        for y in range(height):
-            for x in range(width):
-                pixel = pixels[x, y]
+def main():
+    print("Steganography: LSB Matching Revisited")
+    mode = input("Choose mode (encode/decode): ").strip().lower()
 
-                for color_index in range(3):  # RGB channels
-                    message_bin += str(pixel[color_index] & 1)
+    if mode == "encode":
+        image_path = input("Enter image path: ").strip()
+        message = input("Enter the secret message: ").strip()
+        output_path = input("Enter output image path: ").strip()
 
-        # Convert binary to text
-        return bin_to_text(message_bin)
+        if not os.path.exists(image_path):
+            print("Error: Image path does not exist.")
+            return
+
+        stego = Steganography(image_path)
+        stego.encode(message, output_path)
+        print(f"Message encoded and saved to {output_path}")
+
+    elif mode == "decode":
+        image_path = input("Enter encoded image path: ").strip()
+
+        if not os.path.exists(image_path):
+            print("Error: Image path does not exist.")
+            return
+
+        stego = Steganography(image_path)
+        decoded_message = stego.decode()
+
+        if decoded_message:
+            print(f"Decoded message: {decoded_message}")
+        else:
+            print("No valid message found.")
+
+    else:
+        print("Invalid mode. Choose 'encode' or 'decode'.")
 
 if __name__ == "__main__":
-    image_path = input("Enter the image path: ")
-    stego = LSBSteganography(image_path)
-
-    action = input("Do you want to encode or decode a message? (e/d): ").strip().lower()
-    if action == 'e':
-        message = input("Enter the secret message: ")
-        output_image_path = input("Enter output image path: ")
-        stego.encode(message, output_image_path)
-    elif action == 'd':
-        decoded_message = stego.decode()
-        print(f"Decoded message: {decoded_message}")
-    else:
-        print("Invalid action.")
+    main()
